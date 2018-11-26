@@ -373,8 +373,16 @@ void start_pes (int a) {
     libstart_pes = dlsym(RTLD_NEXT, "start_pes");
   }
   libstart_pes (a);
-  int my_rank=shmem_my_pe();
-  int comm_size=shmem_n_pes();
+
+  if (!libshmem_my_pe) {
+    libshmem_my_pe = dlsym(RTLD_NEXT, "shmem_my_pe");
+  }
+  int my_rank=libshmem_my_pe();
+
+  if (!libshmem_n_pes) {
+    libshmem_n_pes = dlsym(RTLD_NEXT, "shmem_n_pes");
+  }
+  int comm_size=libshmem_n_pes();
 
   char *filename= NULL;
   asprintf(&filename, "eztrace_log_rank_%s", my_rank);

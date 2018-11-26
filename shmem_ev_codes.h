@@ -23,6 +23,9 @@
  * The 2 most significant bytes should correspond to the module id,
  * as below:
  */
+#define EZTRACE_shmem_shmem_init_1 (shmem_PREFIX | 0xff1)
+#define EZTRACE_shmem_shmem_init_2 (shmem_PREFIX | 0xff2)
+
 #define EZTRACE_shmem_start_pes_1 (shmem_PREFIX | 0x1)
 #define EZTRACE_shmem_start_pes_2 (shmem_PREFIX | 0x2)
 #define EZTRACE_shmem_shmem_n_pes_3 (shmem_PREFIX | 0x3)

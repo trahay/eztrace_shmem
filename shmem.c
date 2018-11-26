@@ -10,6 +10,8 @@
 
 
 
+void (*libshmem_init) ();
+
 void (*libstart_pes) (int a);
 
 int (*libshmem_n_pes) ();
@@ -366,6 +368,32 @@ int (*libshmem_test_lock) (long*  a);
 
 static int module_initialized = 0;
 
+
+void shmem_init () {
+  FUNCTION_ENTRY;
+  if (!libshmem_init) { 
+    libshmem_init = dlsym(RTLD_NEXT, "shmem_init");
+  }
+  libshmem_init();
+
+  if (!libshmem_my_pe) {
+    libshmem_my_pe = dlsym(RTLD_NEXT, "shmem_my_pe");
+  }
+  int my_rank=libshmem_my_pe();
+
+  if (!libshmem_n_pes) {
+    libshmem_n_pes = dlsym(RTLD_NEXT, "shmem_n_pes");
+  }
+  int comm_size=libshmem_n_pes();
+
+  char *filename= NULL;
+  asprintf(&filename, "eztrace_log_rank_%s", my_rank);
+  eztrace_set_filename(filename);
+
+  EZTRACE_EVENT_PACKED_2 (EZTRACE_shmem_shmem_init_1, my_rank, comm_size);
+  
+  EZTRACE_EVENT_PACKED_0 (EZTRACE_shmem_shmem_init_2);
+}
 
 void start_pes (int a) {
   FUNCTION_ENTRY;
@@ -2177,7 +2205,8 @@ int shmem_test_lock (long*  a) {
 
 
 START_INTERCEPT
-INTERCEPT2("start_pes", libstart_pes)
+INTERCEPT2("shmem_init", libshmem_init)
+  INTERCEPT2("start_pes", libstart_pes)
 
   INTERCEPT2("shmem_n_pes", libshmem_n_pes)
 

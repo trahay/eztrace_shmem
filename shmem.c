@@ -369,11 +369,19 @@ static int module_initialized = 0;
 
 void start_pes (int a) {
   FUNCTION_ENTRY;
-  EZTRACE_EVENT_PACKED_1 (EZTRACE_shmem_start_pes_1, a);
   if (!libstart_pes) { 
     libstart_pes = dlsym(RTLD_NEXT, "start_pes");
   }
   libstart_pes (a);
+  int my_rank=shmem_my_pe();
+  int comm_size=shmem_n_pes();
+
+  char *filename= NULL;
+  asprintf(&filename, "eztrace_log_rank_%s", my_rank);
+  eztrace_set_filename(filename);
+
+  EZTRACE_EVENT_PACKED_3 (EZTRACE_shmem_start_pes_1, a, my_rank, comm_size);
+  
   EZTRACE_EVENT_PACKED_1 (EZTRACE_shmem_start_pes_2, a);
 }
 

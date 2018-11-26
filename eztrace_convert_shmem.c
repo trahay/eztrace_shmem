@@ -2491,10 +2491,37 @@ print_shmem_stats()
 
 void handleEZTRACE_shmem_start_pes_1() {
     FUNC_NAME;
+
+    int a, rank, world_size;
+    GET_PARAM_PACKED_3(CUR_EV, a, rank, world_size);
+
+    CUR_TRACE->start_time = LITL_READ_GET_TIME(CUR_EV);
+    if(!CUR_TRACE->start) {
+      CUR_RANK = rank;
+      int res __attribute__ ((__unused__));
+      res = CREATE_TRACE_ID_STR(CUR_ID, rank);
+      GET_PROCESS_INFO(CUR_INDEX)->pid = rank;
+      eztrace_create_ids(CUR_INDEX);
+
+      CUR_TRACE->start = 1;
+      NB_START++;
+
+      /* Create the process and the main thread */
+      DECLARE_PROCESS_ID_STR(process_id, CUR_INDEX);
+      CHANGE()
+	addContainer (CURRENT, process_id, "CT_Process", "C_Prog", process_id, "0");
+      new_thread(CUR_THREAD_ID);
+
+    } else {
+      CUR_TRACE->start = 1;
+      NB_START++;
+    }
     DECLARE_THREAD_ID_STR(thread_id, CUR_INDEX, CUR_THREAD_ID);
     DECLARE_CUR_THREAD(p_thread);
     INIT_shmem_THREAD_INFO(p_thread, ptr);
-     CHANGE() pushState (CURRENT, "ST_Thread", thread_id, "shmem_STATE_0");
+
+  
+    CHANGE() pushState (CURRENT, "ST_Thread", thread_id, "shmem_STATE_0");
 }
 void handleEZTRACE_shmem_start_pes_2() {
     FUNC_NAME;

@@ -567,6 +567,7 @@ struct function_stat thread_stats[MAX_THREADS];
 __thread int thread_rank=-1;
 int nb_threads = 0;
 int process_rank = 0;
+FILE* profile_file=NULL;
 
 /* flush period (in ns): 1 second */
 #define FLUSH_PERIOD (1e9)
@@ -651,9 +652,16 @@ void flush_stats() {
   static int first_time=1;
   if(first_time) {
     first_time=0;
-    printf("#timestamp\tprocess_rank\tnb_calls\t average duration per call (ns)\n");
+    char filename [1024];
+    sprintf(filename, "ezt_shmem_profile_%d", process_rank);
+    profile_file=fopen(filename, "w");
+    if(!profile_file) {
+      fprintf(stderr, "Cannot open file %s !\n", filename);
+      abort();
+    }
+    fprintf(profile_file, "#timestamp\tprocess_rank\tnb_calls\t average duration per call (ns)\n");
   }
-  printf("%f\t%d\t%d\t%f\n", cur_date, process_rank, global_stats.nb_call, average_time);  
+  fprintf(profile_file, "%f\t%d\t%d\t%f\n", cur_date, process_rank, global_stats.nb_call, average_time);  
 }
 
 /* check if we should print the average duration */
@@ -3249,4 +3257,7 @@ __shmem_conclude (void)
 {
   /* stop event recording */
   eztrace_stop ();
+  if(profile_file) {    
+    fclose(profile_file);
+  }
 }

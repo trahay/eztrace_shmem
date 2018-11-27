@@ -9,7 +9,7 @@ includedir=${prefix}/include
 BIN = libeztrace-convert-shmem.so libeztrace-shmem.so libeztrace-autostart-shmem.so
 
 ldflags=$(LDFLAGS)  -L${libdir} 
-cflags=$(CFLAGS) -I$(includedir) -DGTG_OUT_OF_ORDER -DTID_RECORDING_ENABLED -I${includedir} -D_GNU_SOURCE
+cflags=$(CFLAGS) -I$(includedir) -DGTG_OUT_OF_ORDER -DTID_RECORDING_ENABLED -I${includedir} -D_GNU_SOURCE -g
 
 CONVERT_LDFLAGS=-L$(libdir)
 RECORD_LDFLAGS=-L$(libdir)

@@ -3231,6 +3231,9 @@ __shmem_init (void)
   if(getenv("EZT_SHMEM_TRACE")) {
     tracing_enabled=1;
     profiling_enabled=0;
+    printf("[EZTrace SHMem] Tracing is enabled\n");
+  } else {
+    printf("[EZTrace SHMem] Profiling is enabled\n");
   }
 
   /* start event recording */
